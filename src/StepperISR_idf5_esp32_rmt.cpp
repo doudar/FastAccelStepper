@@ -7,7 +7,7 @@
 
 #define PART_SIZE (RMT_SIZE / 2)
 
-static bool IRAM_ATTR queue_done(rmt_channel_handle_t tx_chan,
+static bool ARDUINO_ISR_ATTR queue_done(rmt_channel_handle_t tx_chan,
                                  const rmt_tx_done_event_data_t *edata,
                                  void *user_ctx) {
   StepperQueue *q = (StepperQueue *)user_ctx;
@@ -29,7 +29,7 @@ static bool IRAM_ATTR queue_done(rmt_channel_handle_t tx_chan,
     last_entry = 0x00010000 * first_ticks + remaining_ticks;        \
   }
 
-static size_t IRAM_ATTR encode_commands(const void *data, size_t data_size,
+static size_t ARDUINO_ISR_ATTR encode_commands(const void *data, size_t data_size,
                                         size_t symbols_written,
                                         size_t symbols_free,
                                         rmt_symbol_word_t *symbols, bool *done,

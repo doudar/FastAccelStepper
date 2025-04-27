@@ -88,7 +88,7 @@ static struct mapping_s channel2mapping[NUM_QUEUES] = {
 #endif
 };
 
-static void IRAM_ATTR prepare_for_next_command(
+static void ARDUINO_ISR_ATTR prepare_for_next_command(
     StepperQueue *queue, const struct queue_entry *e_next) {
   uint8_t next_steps = e_next->steps;
   if (next_steps > 0) {
@@ -108,7 +108,7 @@ static void IRAM_ATTR prepare_for_next_command(
   REG_SET_BIT(PCNT_CTRL_REG, (1 << (2 * pcnt_unit))); \
   REG_CLR_BIT(PCNT_CTRL_REG, (1 << (2 * pcnt_unit)))
 
-static void IRAM_ATTR apply_command(StepperQueue *queue,
+static void ARDUINO_ISR_ATTR apply_command(StepperQueue *queue,
                                     const struct queue_entry *e) {
   const struct mapping_s *mapping =
       (const struct mapping_s *)queue->driver_data;
@@ -242,7 +242,7 @@ static void IRAM_ATTR apply_command(StepperQueue *queue,
   }
 }
 
-static void IRAM_ATTR init_stop(StepperQueue *q) {
+static void ARDUINO_ISR_ATTR init_stop(StepperQueue *q) {
   // init stop is normally called after the first command,
   // because the second command is entered too late
   // and after the last command aka running out of commands.
@@ -261,7 +261,7 @@ static void IRAM_ATTR init_stop(StepperQueue *q) {
   q->_isRunning = false;
 }
 
-static void IRAM_ATTR what_is_next(StepperQueue *q) {
+static void ARDUINO_ISR_ATTR what_is_next(StepperQueue *q) {
   // when starting the queue, apply_command for the first entry is called.
   // the read pointer stays at this position. This function is reached,
   // if the command to which read pointer points to is completed.
@@ -301,7 +301,7 @@ static void IRAM_ATTR what_is_next(StepperQueue *q) {
   init_stop(q);
 }
 
-static void IRAM_ATTR pcnt_isr_service(void *arg) {
+static void ARDUINO_ISR_ATTR pcnt_isr_service(void *arg) {
   StepperQueue *q = (StepperQueue *)arg;
   what_is_next(q);
 }
@@ -329,14 +329,14 @@ static void IRAM_ATTR pcnt_isr_service(void *arg) {
 
 #endif /* __ESP32_IDF_V44__ */
 
-static void IRAM_ATTR mcpwm0_isr_service(void *arg) {
+static void ARDUINO_ISR_ATTR mcpwm0_isr_service(void *arg) {
   // For whatever reason, this interrupt is constantly called even with int_st =
   // 0 while the timer is running
   MCPWM_SERVICE(MCPWM0, 0, 0);
   MCPWM_SERVICE(MCPWM0, 1, 1);
   MCPWM_SERVICE(MCPWM0, 2, 2);
 }
-static void IRAM_ATTR mcpwm1_isr_service(void *arg) {
+static void ARDUINO_ISR_ATTR mcpwm1_isr_service(void *arg) {
   MCPWM_SERVICE(MCPWM1, 0, 3);
 #ifndef HAVE_ESP32S3_PULSE_COUNTER
   MCPWM_SERVICE(MCPWM1, 1, 4);

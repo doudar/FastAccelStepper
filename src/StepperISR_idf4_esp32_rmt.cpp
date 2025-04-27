@@ -21,7 +21,7 @@
 // the ticks.
 #define PART_SIZE 31
 
-void IRAM_ATTR StepperQueue::stop_rmt(bool both) {
+void ARDUINO_ISR_ATTR StepperQueue::stop_rmt(bool both) {
   // We are stopping the rmt by letting it run into the end at high speed.
   //
   // disable the interrupts
@@ -45,7 +45,7 @@ void IRAM_ATTR StepperQueue::stop_rmt(bool both) {
   _rmtStopped = true;
 }
 
-static void IRAM_ATTR apply_command(StepperQueue *q, bool fill_part_one,
+static void ARDUINO_ISR_ATTR apply_command(StepperQueue *q, bool fill_part_one,
                                     uint32_t *data) {
   if (!fill_part_one) {
     data += PART_SIZE;
@@ -240,7 +240,7 @@ static void IRAM_ATTR apply_command(StepperQueue *q, bool fill_part_one,
   }
 #endif
 
-static void IRAM_ATTR tx_intr_handler(void *arg) {
+static void ARDUINO_ISR_ATTR tx_intr_handler(void *arg) {
   uint32_t mask = RMT.int_st.val;
   RMT.int_clr.val = mask;
   PROCESS_CHANNEL(0);
